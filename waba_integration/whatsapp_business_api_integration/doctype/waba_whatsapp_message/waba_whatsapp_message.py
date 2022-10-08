@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Hussain Nagaria and contributors
 # For license information, please see license.txt
 
+from datetime import datetime
 import frappe
 import requests
 import mimetypes
@@ -42,8 +43,13 @@ class WABAWhatsAppMessage(Document):
 
 	@frappe.whitelist()
 	def send(self) -> Dict:
+		if self.docstatus != 1:
+			frappe.throw(frappe._("Please submit the document to send."))
+
 		if not self.to:
-			frappe.throw("Recepient (`to`) is required to send message.")
+			frappe.throw(frappe._(
+				"Recepient {} is required to send message.").format("(`to`)")
+			)
 
 		access_token = frappe.utils.password.get_decrypted_password(
 			"WABA Settings", "WABA Settings", "access_token"
@@ -53,7 +59,7 @@ class WABAWhatsAppMessage(Document):
 
 		endpoint = f"{api_base}/{phone_number_id}/messages"
 
-		response_data = {
+		request_data = {
 			"messaging_product": "whatsapp",
 			"recipient_type": "individual",
 			"to": self.to,
@@ -61,23 +67,23 @@ class WABAWhatsAppMessage(Document):
 		}
 
 		if self.message_type == "Text":
-			response_data["text"] = {"preview_url": False, "body": self.message_body}
+			request_data["text"] = {"preview_url": False, "body": self.message_body}
 
 		if self.message_type in ("Audio", "Image", "Video", "Document"):
 			if not self.media_id:
 				frappe.throw("Please attach and upload the media before sending this message.")
 
-			response_data[self.message_type.lower()] = {
+			request_data[self.message_type.lower()] = {
 				"id": self.media_id,
 			}
 
 			if self.message_type == "Document":
-				response_data[self.message_type.lower()]["filename"] = self.media_filename
-				response_data[self.message_type.lower()]["caption"] = self.media_caption
+				request_data[self.message_type.lower()]["filename"] = self.media_filename
+				request_data[self.message_type.lower()]["caption"] = self.media_caption
 
 		response = requests.post(
 			endpoint,
-			json=response_data,
+			json=request_data,
 			headers={
 				"Authorization": "Bearer " + access_token,
 				"Content-Type": "application/json",
@@ -87,10 +93,23 @@ class WABAWhatsAppMessage(Document):
 		if response.ok:
 			self.id = response.json().get("messages")[0]["id"]
 			self.status = "Sent"
-			self.save(ignore_permissions=True)
-			return response.json()
+			self.append("attempts", {
+				"timestamp": datetime.now(),
+				"status": "Success"
+			})
 		else:
-			frappe.throw(response.json().get("error").get("message"))
+			self.status = "Failure"
+			error_message = response.json().get("error").get("message")
+			self.append("attempts", {
+				"timestamp": datetime.now(),
+				"status": "Failure",
+				"status_reason": error_message
+			})
+			frappe.msgprint(frappe._(error_message))
+
+		# TODO: remove `ignore_permissions` flag.
+		self.save(ignore_permissions=True)
+		return response.json()
 
 	@frappe.whitelist()
 	def download_media(self) -> Dict:

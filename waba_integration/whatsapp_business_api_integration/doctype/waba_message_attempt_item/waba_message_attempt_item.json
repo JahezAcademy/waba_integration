@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "creation": "2022-09-28 19:28:42.351556",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "timestamp",
+  "status",
+  "status_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Timestamp"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Success\nFailure"
+  },
+  {
+   "fieldname": "status_reason",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Status Reason"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-09-28 19:28:57.640803",
+ "modified_by": "Administrator",
+ "module": "WhatsApp Business API Integration",
+ "name": "WABA Message Attempt Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

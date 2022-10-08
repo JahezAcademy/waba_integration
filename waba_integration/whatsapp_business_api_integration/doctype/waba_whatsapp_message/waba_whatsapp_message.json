@@ -14,6 +14,7 @@
   "from",
   "to",
   "message_type",
+  "notification_broadcast",
   "column_break_3",
   "type",
   "id",
@@ -27,16 +28,21 @@
   "media_caption",
   "media_file",
   "media_image",
-  "media_uploaded"
+  "media_uploaded",
+  "attempts_details_section",
+  "attempts",
+  "amended_from"
  ],
  "fields": [
   {
+   "allow_on_submit": 1,
    "default": "Pending",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Pending\nSent\nDelivered\nRead\nReceived\nMarked As Seen"
+   "options": "Pending\nSent\nDelivered\nRead\nReceived\nMarked As Seen\nFailure",
+   "read_only": 1
   },
   {
    "default": "Outgoing",
@@ -47,6 +53,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "id",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -163,16 +170,46 @@
    "fieldtype": "Check",
    "label": "Media Uploaded",
    "read_only": 1
+  },
+  {
+   "fieldname": "notification_broadcast",
+   "fieldtype": "Link",
+   "label": "Notification Broadcast",
+   "options": "Notification Broadcast",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "attempts_details_section",
+   "fieldtype": "Section Break",
+   "label": "Attempts Details"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "attempts",
+   "fieldtype": "Table",
+   "label": "Attempts",
+   "options": "WABA Message Attempt Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "WABA WhatsApp Message",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "image_field": "media_image",
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2022-05-26 23:52:27.287967",
+ "modified": "2022-09-28 22:03:30.167936",
  "modified_by": "Administrator",
  "module": "WhatsApp Business API Integration",
  "name": "WABA WhatsApp Message",
- "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
@@ -189,6 +226,5 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "DESC"
 }
